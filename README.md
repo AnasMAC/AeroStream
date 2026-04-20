@@ -32,5 +32,5 @@ Use the provided `chunkMaker.sh` bash script to process your raw video using FFm
 1. Place your raw video (e.g., `my_video.mp4`) in the same directory as the script.
 2. Run the script:
    ```bash
-   ./chunkMaker.sh "my_video.mp4"
+   ./chunkMaker.sh my_video.mp4
    ```
