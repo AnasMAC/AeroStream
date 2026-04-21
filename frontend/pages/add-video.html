@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Post</title>
+  </head>
+  <body>
+    <form
+      action="/api/videos"
+      method="post"
+      enctype="multipart/form-data"
+      style="display: flex; flex-direction: column; align-items: flex-start"
+    >
+      <label for="movie-title">Movie Title</label>
+      <input name="title" id="movie-title" type="text" />
+      <label for="movie-category">Movie category</label>
+      <input name="category" id="movie-category" type="text" />
+      <label for="thumbnail">thumbnail</label>
+      <input
+        type="file"
+        name="thumbnail"
+        id="thumbnail"
+        accept="image/png, image/jpeg"
+      />
+      <label for="video">video</label>
+      <input type="file" name="video" id="video" accept="video/*" />
+      <input type="submit" value="Submit" />
+    </form>
+  </body>
+</html>
