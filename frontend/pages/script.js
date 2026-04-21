@@ -87,7 +87,7 @@ function createVideoContainer(videoMetaData) {
     viewVideoPage(videoMetaData);
   });
 
-  div.querySelector("img").src = "/resources/public-media/" + videoMetaData.minio_path + "/thumbnail.jpeg";
+  div.querySelector("img").src = "/resources/public-media/" + videoMetaData.minio_path + "/thumbnail.jpg";
 
   return div;
 }

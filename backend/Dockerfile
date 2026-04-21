@@ -1,23 +1,25 @@
 # Use the official Node.js Alpine image for a minimal footprint
 FROM node:20-alpine
 
+# Install ffmpeg as the root user BEFORE switching users
+RUN apk add --no-cache ffmpeg
+
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json first
-# This leverages Docker's layer caching so you don't reinstall npm packages every time you change app.js
-COPY package*.json ./
+# Copy package.json first, making the 'node' user the owner
+COPY --chown=node:node package*.json ./
 
 # Install only production dependencies
 RUN npm install --omit=dev
 
-# Copy the rest of the application files
-COPY . .
+# Copy the rest of the application files, making the 'node' user the owner
+COPY --chown=node:node . .
 
 # Switch to a non-root user for better security
 USER node
 
-# Expose the port (Assume 3000 if not specified)
+# Expose the port
 EXPOSE 3000
 
 # Start the application

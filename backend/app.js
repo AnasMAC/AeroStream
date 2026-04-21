@@ -5,6 +5,7 @@ import path from 'path';
 import { spawn } from 'child_process';
 import multer from "multer";
 import pg from 'pg'; // Import the pg library
+import client from 'prom-client';
 import 'dotenv/config';
 
 const { Pool } = pg;
@@ -49,8 +50,32 @@ const uploadMiddleware = upload.fields([
   { name: 'video', maxCount: 1 }
 ]);
 
+const collectDefaultMetrics = client.collectDefaultMetrics;
+collectDefaultMetrics({ register: client.register });
+
+const uploadCounter = new client.Counter({
+  name: 'video_uploads_total',
+  help: 'Total number of successful video uploads'
+});
+
+const httpRequestCounter = new client.Counter({
+  name: 'http_requests_total',
+  help: 'Total number of HTTP requests received',
+  labelNames: ['method', 'route', 'status_code']
+});
 
 
+
+app.use((req, res, next) => {
+    res.on('finish', () => {
+        httpRequestCounter.inc({
+            method: req.method,
+            route: req.route ? req.route.path : req.path,
+            status_code: res.statusCode
+        });
+    });
+    next();
+});
 
 async function chunkVideo(inputFilePath) {
   return new Promise((resolve, reject) => {
@@ -99,6 +124,8 @@ async function chunkVideo(inputFilePath) {
     });
   });
 }
+
+
 
 // 3. The Main Express Route
 app.post('/upload', uploadMiddleware, async (req, res) => {
@@ -153,6 +180,8 @@ app.post('/upload', uploadMiddleware, async (req, res) => {
       'INSERT INTO videos (title, category, minio_path) VALUES ($1, $2, $3)',
       [title, category, minioFolderName]
     );
+
+    uploadCounter.inc();
     
 
     // 7. Respond to the frontend
@@ -317,6 +346,15 @@ app.post('/upload', uploadMiddleware, (req, res) => {
   }
 });
 
+
+app.get('/metrics', async (req, res) => {
+    try {
+        res.set('Content-Type', client.register.contentType);
+        res.end(await client.register.metrics());
+    } catch (ex) {
+        res.status(500).end(ex);
+    }
+});
 
 app.listen(port, () => {
   console.log(`app listening at http://localhost:${port}`);
