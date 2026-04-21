@@ -87,7 +87,7 @@ function createVideoContainer(videoMetaData) {
     viewVideoPage(videoMetaData);
   });
 
-  div.querySelector("img").src = "/resources/" + videoMetaData.thumbnail_url;
+  div.querySelector("img").src = "/resources/public-media/" + videoMetaData.minio_path + "/thumbnail.jpeg";
 
   return div;
 }
@@ -124,7 +124,7 @@ function viewVideoPage(videoMetaData) {
   hls = new Hls();
   const video = rootDiv.querySelector("#video");
 
-  hls.loadSource("/resources/" + videoMetaData.manifest_url);
+  hls.loadSource("/resources/public-media/" + videoMetaData.minio_path +"/manifest.m3u8");
   hls.attachMedia(video);
 
   hls.on(Hls.Events.MEDIA_ATTACHED, function () {
